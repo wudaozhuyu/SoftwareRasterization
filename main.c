@@ -5,10 +5,11 @@
 #include "core/image.h"
 #include "core/darray.h"
 #include "core/camera.h"
-#include "model.h"
 #include "core/macro.h"
 #include "core/maths.h"
 #include "core/texture.h"
+#include <math.h>
+#include "model.h"
 
 //ÆÁÄ»
 static const char* WINDOW_TITLE = "³ôÉµÅú";
