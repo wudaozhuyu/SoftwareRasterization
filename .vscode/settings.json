@@ -2,5 +2,6 @@
     "files.associations": {
         "cmath": "c",
         "*.tcc": "c"
-    }
+    },
+    "files.encoding": "gb2312"
 }

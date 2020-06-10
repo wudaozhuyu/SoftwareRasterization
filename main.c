@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "core/graphics.h"
 #include "core/platform.h"
 #include "core/image.h"
@@ -8,27 +9,21 @@
 #include "core/macro.h"
 #include "core/maths.h"
 #include "core/texture.h"
-#include <math.h>
-#include "model.h"
+#include "art/model.h"
 
-//屏幕
-static const char* WINDOW_TITLE = "臭傻批";
+static const char* WINDOW_TITLE = "";
 static const int WINDOW_WIDTH = 800;
 static const int WINDOW_HEIGHT = 600;
 
-//摄像头
 static const vec3_t CAMERA_POSITION = { 0, 0, 1.5 };
 static const vec3_t CAMERA_TARGET = { 0, 0, 0 };
 
-//灯光
 static const float LIGHT_THETA = TO_RADIANS(45);
 static const float LIGHT_PHI = TO_RADIANS(45);
 
-//文件路径
 const char* texture_path = "asset/ponycar/body_basecolor.tga";
 const char* model_path = "asset/ponycar/body.obj";
 
-//输入的顶点属性
 typedef struct
 {
 	vec3_t position;
@@ -37,7 +32,6 @@ typedef struct
 	vec4_t tangent;
 } attribute_t;
 
-//输入的顶点属性
 typedef struct
 {
 	vec2_t texcoord;
@@ -45,7 +39,6 @@ typedef struct
 	vec3_t world_normal;
 } varying_t;
 
-//全局属性
 typedef struct
 {
 	mat4_t model_matrix;
@@ -60,7 +53,6 @@ typedef struct
 
 } uniform_t;
 
-//顶点着色器
 vec4_t vertex_func(void* _attribs, void* _varyings, void* _uniforms)
 {
 	attribute_t* attribs = (attribute_t*)_attribs;
@@ -85,7 +77,6 @@ vec4_t vertex_func(void* _attribs, void* _varyings, void* _uniforms)
 	return clip_position;
 }
 
-//片元/像素着色器
 vec4_t fragment_func(void* varyings_, void* uniforms_, int* discard_, int backface_)
 {
 	varying_t* varyings = (varying_t*)varyings_;
@@ -126,10 +117,8 @@ uniform_t* setupUniform(program_t* program, camera_t* camera)
 
 int main(int argc, char* argv[])
 {
-	//创建摄像头
 	camera_t* camera = camera_create(CAMERA_POSITION, CAMERA_TARGET, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT);
 
-	//帧缓存
 	framebuffer_t* frameBuffer = (framebuffer_t*)malloc(sizeof(frameBuffer));
 	vec4_t default_color = {0, 0, 0, 0};
 	float default_depth = 1.0;
@@ -139,10 +128,8 @@ int main(int argc, char* argv[])
 	frameBuffer->colorbuffer = (vec4_t*)malloc(sizeof(vec4_t) * pix_num);
 	frameBuffer->depthbuffer = (float*)malloc(sizeof(float) * pix_num);
 
-	//模型
 	mesh_t* mesh = load_mesh(model_path);
 
-	//程序
 	vertex_shader_t* vertex_shader = vertex_func;
 	fragment_shader_t* fragment_shader = fragment_func;
 
@@ -152,20 +139,17 @@ int main(int argc, char* argv[])
 
 	program_t* program = program_create(vertex_shader, fragment_shader, sizeof_attribs, sizeof_varyings, sizeof_uniforms, 0, 0);
 
-	//设置全局数据
 	setupUniform(program, camera);
 
 	window_t* window = window_create(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	while (!window_should_close(window))
 	{
-		//清理颜色和深度缓存
 		for (int i = 0; i < pix_num; i++)
 		{
 			frameBuffer->colorbuffer[i] = default_color;
 			frameBuffer->depthbuffer[i] = default_depth;
 		}
 
-		//渲染模型
 		{
 			int face_num = mesh->face_num;
 			for (int i = 0; i < face_num; i++)
